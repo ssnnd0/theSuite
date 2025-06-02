@@ -19,7 +19,8 @@ javascript:(function() {
         apiKey: '',
         model: 'gemini-2.5-flash-preview-05-20', // Fixed model name
         useGoogleSearchGrounding: false,
-        theme: 'dark', // 'light' or 'dark'
+        useUrlContext: true, // New setting for URL context
+        theme: 'dark', // 'light', 'dark', or 'transparent'
     };
 
     let currentChatHistory = [];
@@ -89,31 +90,116 @@ javascript:(function() {
         const isLight = settings.theme === 'light';
         const isTransparent = settings.theme === 'transparent';
     
-        suiteContainer.style.backgroundColor = isTransparent ? 'rgba(128,128,128,0.3)' : isDark ? '#2c2c2c' : '#f0f0f0';
-        suiteContainer.style.color = isTransparent ? '#ffffff' : isDark ? '#e0e0e0' : '#111';
+        // Main container theming
+        suiteContainer.style.backgroundColor = isTransparent ? 'rgba(40,40,40,0.85)' : isDark ? '#1e1e1e' : '#ffffff';
+        suiteContainer.style.color = isTransparent ? '#ffffff' : isDark ? '#e0e0e0' : '#333333';
+        suiteContainer.style.borderColor = isTransparent ? 'rgba(255,255,255,0.2)' : isDark ? '#444' : '#d0d0d0';
+        
+        // Header theming
+        const header = suiteContainer.querySelector('.gas-header');
+        if (header) {
+            header.style.backgroundColor = isTransparent ? 'rgba(60,60,60,0.7)' : isDark ? '#2a2a2a' : '#f8f9fa';
+            header.style.borderBottomColor = isTransparent ? 'rgba(255,255,255,0.1)' : isDark ? '#333' : '#e0e0e0';
+        }
+        
+        // Title theming
+        const title = suiteContainer.querySelector('.gas-title');
+        if (title) {
+            title.style.color = isTransparent ? '#ffffff' : isDark ? '#ffffff' : '#2c3e50';
+        }
+        
+        // Header buttons theming
+        const headerButtons = suiteContainer.querySelectorAll('.gas-header-buttons button');
+        headerButtons.forEach(btn => {
+            btn.style.color = isTransparent ? 'rgba(255,255,255,0.8)' : isDark ? '#aaa' : '#666';
+            btn.addEventListener('mouseenter', () => {
+                btn.style.color = isTransparent ? '#ffffff' : isDark ? '#fff' : '#333';
+            });
+            btn.addEventListener('mouseleave', () => {
+                btn.style.color = isTransparent ? 'rgba(255,255,255,0.8)' : isDark ? '#aaa' : '#666';
+            });
+        });
+        
+        // Tabs theming
+        const tabsContainer = suiteContainer.querySelector('.gas-tabs');
+        if (tabsContainer) {
+            tabsContainer.style.backgroundColor = isTransparent ? 'rgba(50,50,50,0.6)' : isDark ? '#262626' : '#e9ecef';
+            tabsContainer.style.borderBottomColor = isTransparent ? 'rgba(255,255,255,0.1)' : isDark ? '#333' : '#d0d0d0';
+        }
+        
+        const tabs = suiteContainer.querySelectorAll('.gas-tab');
+        tabs.forEach(tab => {
+            if (tab.classList.contains('active')) {
+                tab.style.backgroundColor = isTransparent ? 'rgba(80,80,80,0.8)' : isDark ? '#444' : '#ffffff';
+                tab.style.color = isTransparent ? '#ffffff' : isDark ? '#fff' : '#007bff';
+                tab.style.borderBottomColor = isTransparent ? '#ffffff' : isDark ? '#555' : '#007bff';
+            } else {
+                tab.style.backgroundColor = isTransparent ? 'rgba(60,60,60,0.4)' : isDark ? '#333' : '#f8f9fa';
+                tab.style.color = isTransparent ? 'rgba(255,255,255,0.8)' : isDark ? '#ccc' : '#6c757d';
+                tab.style.borderBottomColor = 'transparent';
+            }
+        });
     
+        // Input fields theming
         const textInputs = suiteContainer.querySelectorAll('input[type="text"], input[type="password"], textarea, select');
         textInputs.forEach(input => {
-            input.style.backgroundColor = isTransparent ? 'rgba(50,50,50,0.1)' : isDark ? '#333' : '#fff';
-            input.style.color = isTransparent ? '#ffffff' : isDark ? '#e0e0e0' : '#111';
-            input.style.borderColor = isTransparent ? 'rgba(200,200,200,0.2)' : isDark ? '#555' : '#ccc';
+            input.style.backgroundColor = isTransparent ? 'rgba(255,255,255,0.1)' : isDark ? '#2b2b2b' : '#ffffff';
+            input.style.color = isTransparent ? '#ffffff' : isDark ? '#e0e0e0' : '#333';
+            input.style.borderColor = isTransparent ? 'rgba(255,255,255,0.3)' : isDark ? '#555' : '#ced4da';
         });
     
-        const buttons = suiteContainer.querySelectorAll('button, .gas-tab');
+        // Buttons theming
+        const buttons = suiteContainer.querySelectorAll('button:not(.gas-tab):not(.gas-header-buttons button)');
         buttons.forEach(btn => {
-            btn.style.backgroundColor = isTransparent ? 'rgba(80,80,80,0.3)' : isDark ? '#444' : '#ddd';
-            btn.style.color = isTransparent ? '#ffffff' : isDark ? '#e0e0e0' : '#111';
-            btn.style.borderColor = isTransparent ? 'rgba(255,255,255,0.1)' : isDark ? '#555' : '#ccc';
+            if (btn.classList.contains('gas-send-btn')) {
+                btn.style.backgroundColor = isTransparent ? 'rgba(40,167,69,0.8)' : '#28a745';
+                btn.style.color = '#ffffff';
+                btn.style.borderColor = isTransparent ? 'rgba(40,167,69,0.6)' : '#28a745';
+            } else if (btn.classList.contains('gas-save-settings-btn')) {
+                btn.style.backgroundColor = isTransparent ? 'rgba(0,123,255,0.8)' : '#007bff';
+                btn.style.color = '#ffffff';
+                btn.style.borderColor = isTransparent ? 'rgba(0,123,255,0.6)' : '#007bff';
+            } else {
+                btn.style.backgroundColor = isTransparent ? 'rgba(108,117,125,0.6)' : isDark ? '#444' : '#f8f9fa';
+                btn.style.color = isTransparent ? '#ffffff' : isDark ? '#e0e0e0' : '#495057';
+                btn.style.borderColor = isTransparent ? 'rgba(255,255,255,0.2)' : isDark ? '#555' : '#ced4da';
+            }
         });
     
+        // Chat messages area theming
         if (chatMessagesDiv) {
-            chatMessagesDiv.style.backgroundColor = isTransparent ? 'rgba(20,20,20,0.3)' : isDark ? '#222' : '#fff';
-            chatMessagesDiv.style.borderColor = isTransparent ? 'rgba(255,255,255,0.3)' : isDark ? '#444' : '#ccc';
+            chatMessagesDiv.style.backgroundColor = isTransparent ? 'rgba(0,0,0,0.3)' : isDark ? '#222' : '#ffffff';
+            chatMessagesDiv.style.borderColor = isTransparent ? 'rgba(255,255,255,0.2)' : isDark ? '#444' : '#dee2e6';
+            
             chatMessagesDiv.querySelectorAll('.user-message, .ai-message').forEach(msgDiv => {
-                msgDiv.style.backgroundColor = msgDiv.classList.contains('user-message')
-                    ? isTransparent ? 'rgba(90,140,180,0.5)' : isDark ? '#3a5a78' : '#d1e7ff'
-                    : isTransparent ? 'rgba(255,255,255,0.1)' : isDark ? '#4a4a4a' : '#e9e9e9';
+                if (msgDiv.classList.contains('user-message')) {
+                    msgDiv.style.backgroundColor = isTransparent ? 'rgba(0,123,255,0.7)' : isDark ? '#2d6ea7' : '#007bff';
+                    msgDiv.style.color = '#ffffff';
+                } else {
+                    msgDiv.style.backgroundColor = isTransparent ? 'rgba(255,255,255,0.15)' : isDark ? '#3a3a3a' : '#f8f9fa';
+                    msgDiv.style.color = isTransparent ? '#ffffff' : isDark ? '#e0e0e0' : '#333';
+                }
             });
+        }
+        
+        // File preview area theming
+        const filePreviewItems = suiteContainer.querySelectorAll('.gas-file-preview-item');
+        filePreviewItems.forEach(item => {
+            item.style.backgroundColor = isTransparent ? 'rgba(108,117,125,0.6)' : isDark ? '#555' : '#e9ecef';
+            item.style.color = isTransparent ? '#ffffff' : isDark ? '#e0e0e0' : '#495057';
+        });
+        
+        // Resize handle theming
+        const resizeHandle = suiteContainer.querySelector('.gas-resize-handle');
+        if (resizeHandle) {
+            const handleColor = isTransparent ? 'rgba(255,255,255,0.3)' : isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.2)';
+            resizeHandle.style.background = `repeating-linear-gradient(
+                -45deg,
+                ${handleColor},
+                ${handleColor} 1px,
+                transparent 1px,
+                transparent 3px
+            )`;
         }
     }
 
@@ -126,7 +212,7 @@ javascript:(function() {
             <div class="gas-header">
                 <span class="gas-title">theSuite</span>
                 <div class="gas-header-buttons">
-                    <button class="gas-minimize-btn" title="Minimize">-</button>
+                    <button class="gas-minimize-btn" title="Minimize">−</button>
                     <button class="gas-close-btn" title="Close">×</button>
                 </div>
             </div>
@@ -138,37 +224,53 @@ javascript:(function() {
                 <div class="gas-chat-messages"></div>
                 <div class="gas-chat-input-area">
                     <div class="gas-file-preview-area"></div>
-                    <textarea class="gas-chat-input" placeholder="Type your message or drop an image..."></textarea>
+                    <textarea class="gas-chat-input" placeholder="Type your message or drop files here..."></textarea>
                     <div class="gas-chat-buttons">
-                        <button class="gas-send-btn">Send</button>
+                        <button class="gas-send-btn">S</button>
                         <input type="file" class="gas-file-input" accept="image/*,application/pdf,text/plain" style="display:none;" multiple>
-                        <button class="gas-attach-btn" title="Attach File (Image, PDF, TXT)">📎</button>
-                        <button class="gas-paste-btn" title="Paste from Clipboard">📋</button>
+                        <button class="gas-attach-btn" title="Attach File (Image, PDF, TXT)">F</button>
+                        <button class="gas-paste-btn" title="Paste from Clipboard">P</button>
+                        <button class="gas-clear-btn" title="Clear Chat">C</button>
                     </div>
                 </div>
             </div>
             <div class="gas-tab-content gas-settings-content" style="display:none;">
-                <label>API Key: <input type="password" class="gas-api-key" value="${settings.apiKey}"></label>
-                <label>Model:
-                    <select class="gas-model-select">
-                        <option value="gemini-2.5-flash-preview-05-20" ${settings.model === 'gemini-2.5-flash-preview-05-20' ? 'selected' : ''}>Gemini 2.5 Flash Preview 5:20</option>
-                        <option value="gemini-2.5-pro-preview-05-06" ${settings.model === 'gemini-2.5-pro-preview-05-06' ? 'selected' : ''}>Gemini 2.5 Pro Preview 05-06 ***DOESNT WORK***</option>
-                    </select>
-                </label>
-                <label>
-                    <input type="checkbox" class="gas-grounding-cb" ${settings.useGoogleSearchGrounding ? 'checked' : ''}>
-                    Use Google Search Grounding
-                </label>
-                <label>Theme:
-                    <select class="gas-theme-select">
-                        <option value="dark" ${settings.theme === 'dark' ? 'selected' : ''}>Dark</option>
-                        <option value="light" ${settings.theme === 'light' ? 'selected' : ''}>Light</option>
-                        <option value="transparent" ${settings.theme === 'transparent' ? 'selected' : ''}>Transparent</option>
-                    </select>
-                </label>
+                <div class="gas-settings-section">
+                    <h3>API Configuration</h3>
+                    <label>API Key: <input type="password" class="gas-api-key" value="${settings.apiKey}" placeholder="Enter your Gemini API key"></label>
+                    <label>Model:
+                        <select class="gas-model-select">
+                            <option value="gemini-2.5-flash-preview-05-20" ${settings.model === 'gemini-2.5-flash-preview-05-20' ? 'selected' : ''}>Gemini 2.5 Flash Preview</option>
+                            <option value="gemini-2.5-pro-preview-05-06" ${settings.model === 'gemini-2.5-pro-preview-05-06' ? 'selected' : ''}>Gemini 2.5 Pro Preview (Experimental)</option>
+                        </select>
+                    </label>
+                </div>
+                
+                <div class="gas-settings-section">
+                    <h3>Features</h3>
+                    <label class="gas-checkbox-label">
+                        <input type="checkbox" class="gas-grounding-cb" ${settings.useGoogleSearchGrounding ? 'checked' : ''}>
+                        <span class="gas-checkbox-custom"></span>
+                        Enable Google Search Grounding
+                    </label>
+                    <label class="gas-checkbox-label">
+                        <input type="checkbox" class="gas-url-context-cb" ${settings.useUrlContext ? 'checked' : ''}>
+                        <span class="gas-checkbox-custom"></span>
+                        Include current page URL as context
+                    </label>
+                </div>
+                
+                <div class="gas-settings-section">
+                    <h3>Appearance</h3>
+                    <label>Theme:
+                        <select class="gas-theme-select">
+                            <option value="dark" ${settings.theme === 'dark' ? 'selected' : ''}>Dark</option>
+                            <option value="light" ${settings.theme === 'light' ? 'selected' : ''}>Light</option>
+                            <option value="transparent" ${settings.theme === 'transparent' ? 'selected' : ''}>Transparent</option>
+                        </select>
+                    </label>
+                </div>
                 <button class="gas-save-settings-btn">Save Settings</button>
-                <p style="font-size:0.8em; margin-top:15px;">API Key is stored in LocalStorage. Be cautious on shared computers.</p>
-                <p style="font-size:0.8em;">Chat history is stored per-page in LocalStorage.</p>
             </div>
             <div class="gas-resize-handle"></div>
         `;
@@ -249,7 +351,7 @@ javascript:(function() {
             e.preventDefault();
         };
     }
-
+    
     function applyStyles() {
         const style = document.createElement('style');
         style.textContent = `
@@ -601,7 +703,6 @@ javascript:(function() {
             settings.theme = suiteContainer.querySelector('.gas-theme-select').value;
             saveSettings();
             applyTheme();
-            alert('Settings saved!');
         };
 
         suiteContainer.querySelector('.gas-send-btn').onclick = sendChatMessage;
