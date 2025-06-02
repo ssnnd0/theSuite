@@ -74,27 +74,37 @@ getElementById
 
     function applyTheme() {
         const isDark = settings.theme === 'dark';
-        suiteContainer.style.backgroundColor = isDark ? '#2c2c2c' : '#f0f0f0';
-        suiteContainer.style.color = isDark ? '#e0e0e0' : '#111';
-        const textInputs = suiteContainer.querySelectorAll('input[type="text"], textarea, select');
+        const isLight = settings.theme === 'light';
+        const isTransparent = settings.theme === 'transparent';
+    
+        suiteContainer.style.backgroundColor = isTransparent ? 'rgba(30,30,30,0.6)' : isDark ? '#2c2c2c' : '#f0f0f0';
+        suiteContainer.style.color = isTransparent ? '#ffffff' : isDark ? '#e0e0e0' : '#111';
+    
+        const textInputs = suiteContainer.querySelectorAll('input[type="text"], input[type="password"], textarea, select');
         textInputs.forEach(input => {
-            input.style.backgroundColor = isDark ? '#333' : '#fff';
-            input.style.color = isDark ? '#e0e0e0' : '#111';
-            input.style.borderColor = isDark ? '#555' : '#ccc';
+            input.style.backgroundColor = isTransparent ? 'rgba(50,50,50,0.3)' : isDark ? '#333' : '#fff';
+            input.style.color = isTransparent ? '#ffffff' : isDark ? '#e0e0e0' : '#111';
+            input.style.borderColor = isTransparent ? 'rgba(200,200,200,0.4)' : isDark ? '#555' : '#ccc';
         });
+    
         const buttons = suiteContainer.querySelectorAll('button, .gas-tab');
-         buttons.forEach(btn => {
-            btn.style.backgroundColor = isDark ? '#444' : '#ddd';
-            btn.style.color = isDark ? '#e0e0e0' : '#111';
-            btn.style.borderColor = isDark ? '#555' : '#ccc';
+        buttons.forEach(btn => {
+            btn.style.backgroundColor = isTransparent ? 'rgba(80,80,80,0.4)' : isDark ? '#444' : '#ddd';
+            btn.style.color = isTransparent ? '#ffffff' : isDark ? '#e0e0e0' : '#111';
+            btn.style.borderColor = isTransparent ? 'rgba(255,255,255,0.2)' : isDark ? '#555' : '#ccc';
         });
+    
         if (chatMessagesDiv) {
-             chatMessagesDiv.style.borderColor = isDark ? '#444' : '#ccc';
-             chatMessagesDiv.querySelectorAll('.user-message, .ai-message').forEach(msgDiv => {
-                msgDiv.style.backgroundColor = msgDiv.classList.contains('user-message') ? (isDark ? '#3a5a78' : '#d1e7ff') : (isDark ? '#4a4a4a' : '#e9e9e9');
-             });
+            chatMessagesDiv.style.backgroundColor = isTransparent ? 'rgba(20,20,20,0.3)' : isDark ? '#222' : '#fff';
+            chatMessagesDiv.style.borderColor = isTransparent ? 'rgba(255,255,255,0.3)' : isDark ? '#444' : '#ccc';
+            chatMessagesDiv.querySelectorAll('.user-message, .ai-message').forEach(msgDiv => {
+                msgDiv.style.backgroundColor = msgDiv.classList.contains('user-message')
+                    ? isTransparent ? 'rgba(90,140,180,0.5)' : isDark ? '#3a5a78' : '#d1e7ff'
+                    : isTransparent ? 'rgba(255,255,255,0.1)' : isDark ? '#4a4a4a' : '#e9e9e9';
+            });
         }
     }
+
 
 
     // --- HTML Structure and Styling ---
@@ -143,6 +153,7 @@ getElementById
                     <select class="gas-theme-select">
                         <option value="dark" ${settings.theme === 'dark' ? 'selected' : ''}>Dark</option>
                         <option value="light" ${settings.theme === 'light' ? 'selected' : ''}>Light</option>
+                        <option value="transparent" ${settings.theme === 'transparent' ? 'selected' : ''}>Transparent</option>
                     </select>
                 </label>
                 <button class="gas-save-settings-btn">Save Settings</button>
