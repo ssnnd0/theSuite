@@ -1,9 +1,9 @@
 javascript:(function() {
     const BOOKMARKLET_ID = 
-'gemini-ai-suite-bookmarklet'
+'theSuite'
 ;
     const MINIMIZED_ID = 
-'gemini-ai-suite-minimized'
+'theSuite-minimized'
 ;
 
     if (document.getElementById(
@@ -18,14 +18,14 @@ getElementById
         } else {
             existing.querySelector('.gas-close-btn').click(); // Close if open
             const minimized = document.getElementById(MINIMIZED_ID); // also remove minimized if somehow present
-            if (minimized) minimized.remove();
+            if (minimized) minimized.click();
         }
         return;
     }
 
     let settings = {
         apiKey: '',
-        model: 'gemini-2.5-pro-latest', // or 'gemini-1.5-flash-latest'
+        model: 'gemini-2.5-pro-preview-05-06', // or 'gemini-1.5-flash-latest'
         useGoogleSearchGrounding: false,
         theme: 'dark', // 'light' or 'dark'
         // Add more settings as needed
@@ -43,11 +43,11 @@ getElementById
     minimizedIcon.textContent = '*';
 
     function saveSettings() {
-        localStorage.setItem('geminiSuiteSettings', JSON.stringify(settings));
+        localStorage.setItem('SuiteSettings', JSON.stringify(settings));
     }
 
     function loadSettings() {
-        const saved = localStorage.getItem('geminiSuiteSettings');
+        const saved = localStorage.getItem('SuiteSettings');
         if (saved) {
             settings = { ...settings, ...JSON.parse(saved) };
         }
@@ -56,7 +56,7 @@ getElementById
     function getPageChatKey() {
         // Sanitize URL to create a valid localStorage key
         let pageKey = window.location.href.replace(/[^a-zA-Z0-9_-]/g, '_');
-        return `geminiSuiteChat_${pageKey}`;
+        return `SuiteChat_${pageKey}`;
     }
 
     function saveChatHistory() {
@@ -104,7 +104,7 @@ getElementById
 
         suiteContainer.innerHTML = `
             <div class="gas-header">
-                <span class="gas-title">Gemini AI Suite</span>
+                <span class="gas-title">theSuite</span>
                 <div class="gas-header-buttons">
                     <button class="gas-minimize-btn" title="Minimize">-</button>
                     <button class="gas-close-btn" title="Close">X</button>
@@ -229,106 +229,267 @@ getElementById
                 height: 600px;
                 min-width: 300px;
                 min-height: 200px;
-                background-color: #2c2c2c; /* Default dark theme */
-                color: #e0e0e0;
-                border: 1px solid #555;
-                border-radius: 8px;
-                box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+                background-color: #1e1e1e;
+                color: #f0f0f0;
+                border: 1px solid #444;
+                border-radius: 10px;
+                box-shadow: 0 8px 20px rgba(0,0,0,0.5);
                 z-index: 99999;
                 display: flex;
                 flex-direction: column;
-                font-family: sans-serif;
-                overflow: hidden; /* Important for resize handle and content flow */
+                font-family: 'Segoe UI', Tahoma, sans-serif;
+                overflow: hidden;
+                transition: all 0.3s ease;
             }
+            
             .gas-header {
-                background-color: #333;
-                padding: 8px 12px;
+                background-color: #2a2a2a;
+                padding: 10px 14px;
                 cursor: grab;
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
-                border-top-left-radius: 7px;
-                border-top-right-radius: 7px;
+                border-top-left-radius: 10px;
+                border-top-right-radius: 10px;
             }
-            .gas-title { font-weight: bold; }
+            
+            .gas-title {
+                font-weight: 600;
+                font-size: 1.05em;
+            }
+            
             .gas-header-buttons button {
-                background: none; border: none; color: #ccc; font-size: 16px; cursor: pointer; margin-left: 5px; padding: 2px 5px;
+                background: none;
+                border: none;
+                color: #aaa;
+                font-size: 16px;
+                cursor: pointer;
+                margin-left: 5px;
+                padding: 2px 6px;
+                transition: color 0.2s ease;
             }
-            .gas-header-buttons button:hover { color: #fff; }
-            .gas-tabs { display: flex; background-color: #383838; }
+            
+            .gas-header-buttons button:hover {
+                color: #fff;
+            }
+            
+            .gas-tabs {
+                display: flex;
+                background-color: #262626;
+                border-bottom: 1px solid #333;
+            }
+            
             .gas-tab {
                 padding: 10px 15px;
                 cursor: pointer;
-                border: none;
-                background-color: #444; /* Default dark theme */
-                color: #e0e0e0;
-                flex-grow: 1; text-align:center;
+                background-color: #333;
+                color: #ccc;
+                flex-grow: 1;
+                text-align: center;
+                transition: background 0.2s ease, color 0.2s ease;
             }
-            .gas-tab.active { background-color: #555; font-weight: bold; }
-            .gas-tab:not(.active):hover { background-color: #4a4a4a; }
-            .gas-tab-content { padding: 15px; flex-grow: 1; display: flex; flex-direction: column; overflow: hidden; }
-            .gas-chat-content { /* specific styles if needed */ }
-            .gas-settings-content { overflow-y: auto; }
-            .gas-settings-content label { display: block; margin-bottom: 10px; }
-            .gas-settings-content input[type="text"], .gas-settings-content input[type="password"], .gas-settings-content select {
-                width: calc(100% - 10px); padding: 8px; margin-top: 3px; border-radius: 4px;
-                background-color: #333; color: #e0e0e0; border: 1px solid #555;
+            
+            .gas-tab.active {
+                background-color: #444;
+                color: #fff;
+                font-weight: bold;
             }
+            
+            .gas-tab:not(.active):hover {
+                background-color: #3a3a3a;
+            }
+            
+            .gas-tab-content {
+                padding: 16px;
+                flex-grow: 1;
+                display: flex;
+                flex-direction: column;
+                overflow: hidden;
+            }
+            
+            .gas-settings-content {
+                overflow-y: auto;
+            }
+            
+            .gas-settings-content label {
+                display: block;
+                margin-bottom: 10px;
+                font-weight: 500;
+                color: #d0d0d0;
+            }
+            
+            .gas-settings-content input[type="text"],
+            .gas-settings-content input[type="password"],
+            .gas-settings-content select {
+                width: 100%;
+                padding: 8px;
+                border-radius: 5px;
+                background-color: #2e2e2e;
+                color: #f0f0f0;
+                border: 1px solid #555;
+                transition: border 0.2s ease;
+            }
+            
+            .gas-settings-content input:focus,
+            .gas-settings-content select:focus {
+                border-color: #007bff;
+                outline: none;
+            }
+            
             .gas-save-settings-btn {
-                padding: 10px 15px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; margin-top: 10px;
+                padding: 10px 15px;
+                background-color: #007bff;
+                color: white;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+                margin-top: 10px;
+                transition: background-color 0.2s ease;
             }
-            .gas-save-settings-btn:hover { background-color: #0056b3; }
-
+            
+            .gas-save-settings-btn:hover {
+                background-color: #0056b3;
+            }
+            
             .gas-chat-messages {
                 flex-grow: 1;
                 overflow-y: auto;
                 margin-bottom: 10px;
-                border: 1px solid #444; /* Default dark theme */
+                border: 1px solid #444;
                 padding: 10px;
+                border-radius: 6px;
+                display: flex;
+                flex-direction: column;
+                background-color: #222;
+            }
+            
+            .user-message, .ai-message {
+                padding: 10px 14px;
+                border-radius: 18px;
+                margin-bottom: 8px;
+                max-width: 80%;
+                font-size: 0.95em;
+                line-height: 1.4;
+                word-wrap: break-word;
+                transition: background-color 0.2s ease;
+            }
+            
+            .user-message {
+                background-color: #2d6ea7;
+                align-self: flex-end;
+                color: #fff;
+                border-bottom-right-radius: 4px;
+            }
+            
+            .ai-message {
+                background-color: #3a3a3a;
+                align-self: flex-start;
+                border-bottom-left-radius: 4px;
+            }
+            
+            .ai-message pre {
+                white-space: pre-wrap;
+                background-color: rgba(255, 255, 255, 0.05);
+                padding: 8px;
+                border-radius: 5px;
+                font-family: monospace;
+                overflow-x: auto;
+            }
+            
+            .ai-message code:not(pre code) {
+                background-color: rgba(255, 255, 255, 0.08);
+                padding: 2px 4px;
                 border-radius: 4px;
+                font-family: monospace;
+            }
+            
+            .gas-chat-input-area {
                 display: flex;
                 flex-direction: column;
             }
-            .user-message, .ai-message {
-                padding: 8px 12px;
-                border-radius: 15px;
-                margin-bottom: 8px;
-                max-width: 80%;
-                word-wrap: break-word;
-                font-size: 0.95em;
+            
+            .gas-file-preview-area {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 6px;
+                margin-bottom: 6px;
+                max-height: 60px;
+                overflow-y: auto;
             }
-            .user-message { background-color: #3a5a78; align-self: flex-end; border-bottom-right-radius: 3px; } /* Default dark theme */
-            .ai-message { background-color: #4a4a4a; align-self: flex-start; border-bottom-left-radius: 3px; } /* Default dark theme */
-            .ai-message pre { white-space: pre-wrap; word-wrap: break-word; background-color: rgba(0,0,0,0.2); padding: 8px; border-radius: 4px; font-family: monospace; }
-            .ai-message code:not(pre code) { background-color: rgba(0,0,0,0.3); padding: 1px 3px; border-radius: 3px; font-family: monospace; }
-
-            .gas-chat-input-area { display: flex; flex-direction: column; }
-            .gas-file-preview-area { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 5px; max-height: 60px; overflow-y: auto;}
-            .gas-file-preview-item { background-color: #555; padding: 2px 5px; border-radius: 3px; font-size: 0.8em; display: flex; align-items: center; }
-            .gas-file-preview-item button { background:transparent; border:none; color: #f00; cursor:pointer; margin-left: 5px; padding: 0;}
-            .gas-chat-input {
-                width: calc(100% - 16px); /* padding adjustments */
-                padding: 8px;
+            
+            .gas-file-preview-item {
+                background-color: #555;
+                padding: 3px 6px;
                 border-radius: 4px;
-                border: 1px solid #555; /* Default dark theme */
-                margin-bottom: 5px;
+                font-size: 0.8em;
+                display: flex;
+                align-items: center;
+            }
+            
+            .gas-file-preview-item button {
+                background: transparent;
+                border: none;
+                color: #ff4444;
+                cursor: pointer;
+                margin-left: 6px;
+                padding: 0;
+            }
+            
+            .gas-chat-input {
+                width: 100%;
+                padding: 10px;
+                border-radius: 5px;
+                border: 1px solid #555;
+                margin-bottom: 6px;
                 min-height: 50px;
                 resize: vertical;
-                background-color: #333; color: #e0e0e0; /* Default dark theme */
+                background-color: #2b2b2b;
+                color: #f0f0f0;
+                transition: border 0.2s ease;
             }
-            .gas-chat-buttons { display: flex; justify-content: space-between; }
+            
+            .gas-chat-input:focus {
+                border-color: #28a745;
+                outline: none;
+            }
+            
+            .gas-chat-buttons {
+                display: flex;
+                justify-content: space-between;
+            }
+            
             .gas-chat-buttons button {
-                padding: 8px 10px; border-radius: 4px; cursor: pointer; border: 1px solid #555; /* Default dark theme */
-                background-color: #444; color: #e0e0e0; /* Default dark theme */
+                padding: 8px 12px;
+                border-radius: 5px;
+                cursor: pointer;
+                border: 1px solid #555;
+                background-color: #393939;
+                color: #e0e0e0;
+                transition: background-color 0.2s ease;
             }
-            .gas-send-btn { flex-grow: 1; margin-right: 5px; background-color: #28a745 !important; }
-            .gas-send-btn:hover { background-color: #1e7e34 !important; }
-            .gas-attach-btn, .gas-paste-btn { min-width: 40px; text-align: center; }
-
+            
+            .gas-send-btn {
+                flex-grow: 1;
+                margin-right: 6px;
+                background-color: #28a745 !important;
+            }
+            
+            .gas-send-btn:hover {
+                background-color: #1e7e34 !important;
+            }
+            
+            .gas-attach-btn,
+            .gas-paste-btn {
+                min-width: 40px;
+                text-align: center;
+            }
+            
             .gas-resize-handle {
-                width: 15px; height: 15px;
+                width: 15px;
+                height: 15px;
                 position: absolute;
-                bottom: 0; right: 0;
+                bottom: 0;
+                right: 0;
                 cursor: nwse-resize;
                 background: repeating-linear-gradient(
                     -45deg,
@@ -338,22 +499,30 @@ getElementById
                     transparent 3px
                 );
             }
+            
             #${MINIMIZED_ID} {
                 position: fixed;
                 bottom: 10px;
                 right: 10px;
                 width: 30px;
                 height: 30px;
-                color: rgba(128, 128, 128, 0.2);
+                color: rgba(200, 200, 200, 0.2);
                 border-radius: 50%;
                 display: flex;
                 justify-content: center;
                 align-items: center;
-                font-size: 10px;
+                font-size: 12px;
                 cursor: pointer;
                 z-index: 99998;
+                background-color: #333;
+                transition: background-color 0.2s ease, color 0.2s ease;
             }
-        `;
+            
+            #${MINIMIZED_ID}:hover {
+                background-color: #444;
+                color: rgba(255, 255, 255, 0.6);
+            }
+
         document.head.appendChild(style);
         window.geminiSuiteStyleCleanup = () => style.remove(); // For cleanup if needed
     }
