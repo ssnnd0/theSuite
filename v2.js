@@ -1,34 +1,25 @@
 javascript:(function() {
-    const BOOKMARKLET_ID = 
-'theSuite'
-;
-    const MINIMIZED_ID = 
-'theSuite-minimized'
-;
+    const BOOKMARKLET_ID = 'theSuite';
+    const MINIMIZED_ID = 'theSuite-minimized';
 
-    if (document.getElementById(
-BOOKMARKLET_ID
-)) {
-        const existing = document.
-getElementById
-(BOOKMARKLET_ID);
+    if (document.getElementById(BOOKMARKLET_ID)) {
+        const existing = document.getElementById(BOOKMARKLET_ID);
         if (existing.style.display === 'none') {
             const minimized = document.getElementById(MINIMIZED_ID);
             if (minimized) minimized.click(); // Restore if minimized
         } else {
             existing.querySelector('.gas-close-btn').click(); // Close if open
             const minimized = document.getElementById(MINIMIZED_ID); // also remove minimized if somehow present
-            if (minimized) minimized.click();
+            if (minimized) minimized.remove();
         }
         return;
     }
 
     let settings = {
         apiKey: '',
-        model: 'gemini-2.5-pro-preview-05-06', // or 'gemini-1.5-flash-latest'
+        model: 'gemini-2.5-pro-latest', // Fixed model name
         useGoogleSearchGrounding: false,
         theme: 'dark', // 'light' or 'dark'
-        // Add more settings as needed
     };
 
     let currentChatHistory = [];
@@ -40,34 +31,55 @@ getElementById
 
     const minimizedIcon = document.createElement('div');
     minimizedIcon.id = MINIMIZED_ID;
-    minimizedIcon.textContent = '*';
+    minimizedIcon.textContent = '★';
+
+    // Declare these at the top level
+    let chatMessagesDiv, chatInput, fileInput, filePreviewArea;
 
     function saveSettings() {
-        localStorage.setItem('SuiteSettings', JSON.stringify(settings));
+        try {
+            localStorage.setItem('SuiteSettings', JSON.stringify(settings));
+        } catch (e) {
+            console.error('Failed to save settings:', e);
+        }
     }
 
     function loadSettings() {
-        const saved = localStorage.getItem('SuiteSettings');
-        if (saved) {
-            settings = { ...settings, ...JSON.parse(saved) };
+        try {
+            const saved = localStorage.getItem('SuiteSettings');
+            if (saved) {
+                settings = { ...settings, ...JSON.parse(saved) };
+            }
+        } catch (e) {
+            console.error('Failed to load settings:', e);
         }
     }
 
     function getPageChatKey() {
         // Sanitize URL to create a valid localStorage key
         let pageKey = window.location.href.replace(/[^a-zA-Z0-9_-]/g, '_');
+        if (pageKey.length > 50) pageKey = pageKey.substring(0, 50); // Limit key length
         return `SuiteChat_${pageKey}`;
     }
 
     function saveChatHistory() {
-        localStorage.setItem(getPageChatKey(), JSON.stringify(currentChatHistory));
+        try {
+            localStorage.setItem(getPageChatKey(), JSON.stringify(currentChatHistory));
+        } catch (e) {
+            console.error('Failed to save chat history:', e);
+        }
     }
 
     function loadChatHistory() {
-        const savedChat = localStorage.getItem(getPageChatKey());
-        if (savedChat) {
-            currentChatHistory = JSON.parse(savedChat);
-        } else {
+        try {
+            const savedChat = localStorage.getItem(getPageChatKey());
+            if (savedChat) {
+                currentChatHistory = JSON.parse(savedChat);
+            } else {
+                currentChatHistory = [];
+            }
+        } catch (e) {
+            console.error('Failed to load chat history:', e);
             currentChatHistory = [];
         }
     }
@@ -105,8 +117,6 @@ getElementById
         }
     }
 
-
-
     // --- HTML Structure and Styling ---
     function initUI() {
         loadSettings();
@@ -117,7 +127,7 @@ getElementById
                 <span class="gas-title">theSuite</span>
                 <div class="gas-header-buttons">
                     <button class="gas-minimize-btn" title="Minimize">-</button>
-                    <button class="gas-close-btn" title="Close">X</button>
+                    <button class="gas-close-btn" title="Close">×</button>
                 </div>
             </div>
             <div class="gas-tabs">
@@ -133,7 +143,7 @@ getElementById
                         <button class="gas-send-btn">Send</button>
                         <input type="file" class="gas-file-input" accept="image/*,application/pdf,text/plain" style="display:none;" multiple>
                         <button class="gas-attach-btn" title="Attach File (Image, PDF, TXT)">📎</button>
-                        <button class="gas-paste-btn" title="Paste from Clipboard">?</button>
+                        <button class="gas-paste-btn" title="Paste from Clipboard">📋</button>
                     </div>
                 </div>
             </div>
@@ -162,9 +172,16 @@ getElementById
             </div>
             <div class="gas-resize-handle"></div>
         `;
+        
         document.body.appendChild(suiteContainer);
         document.body.appendChild(minimizedIcon);
         minimizedIcon.style.display = 'none';
+
+        // Get references to elements after they're created
+        chatMessagesDiv = suiteContainer.querySelector('.gas-chat-messages');
+        chatInput = suiteContainer.querySelector('.gas-chat-input');
+        fileInput = suiteContainer.querySelector('.gas-file-input');
+        filePreviewArea = suiteContainer.querySelector('.gas-file-preview-area');
 
         applyStyles();
         applyTheme(); // Apply initial theme
@@ -212,19 +229,23 @@ getElementById
             const startWidth = parseInt(document.defaultView.getComputedStyle(suiteContainer).width, 10);
             const startHeight = parseInt(document.defaultView.getComputedStyle(suiteContainer).height, 10);
 
-            document.onmousemove = function(e) {
+            function doResize(e) {
                 if (isResizing) {
                     suiteContainer.style.width = (startWidth + e.clientX - startX) + 'px';
                     suiteContainer.style.height = (startHeight + e.clientY - startY) + 'px';
                 }
-            };
-            document.onmouseup = function() {
+            }
+
+            function stopResize() {
                 if (isResizing) {
                     isResizing = false;
-                    document.onmousemove = null;
-                    document.onmouseup = null;
+                    document.removeEventListener('mousemove', doResize);
+                    document.removeEventListener('mouseup', stopResize);
                 }
-            };
+            }
+
+            document.addEventListener('mousemove', doResize);
+            document.addEventListener('mouseup', stopResize);
             e.preventDefault();
         };
     }
@@ -298,6 +319,7 @@ getElementById
                 flex-grow: 1;
                 text-align: center;
                 transition: background 0.2s ease, color 0.2s ease;
+                border: none;
             }
             
             .gas-tab.active {
@@ -339,6 +361,7 @@ getElementById
                 color: #f0f0f0;
                 border: 1px solid #555;
                 transition: border 0.2s ease;
+                box-sizing: border-box;
             }
             
             .gas-settings-content input:focus,
@@ -457,6 +480,8 @@ getElementById
                 background-color: #2b2b2b;
                 color: #f0f0f0;
                 transition: border 0.2s ease;
+                box-sizing: border-box;
+                font-family: inherit;
             }
             
             .gas-chat-input:focus {
@@ -467,6 +492,7 @@ getElementById
             .gas-chat-buttons {
                 display: flex;
                 justify-content: space-between;
+                gap: 6px;
             }
             
             .gas-chat-buttons button {
@@ -481,7 +507,6 @@ getElementById
             
             .gas-send-btn {
                 flex-grow: 1;
-                margin-right: 6px;
                 background-color: #28a745 !important;
             }
             
@@ -517,35 +542,30 @@ getElementById
                 right: 10px;
                 width: 30px;
                 height: 30px;
-                color: rgba(200, 200, 200, 0.2);
+                color: rgba(200, 200, 200, 0.8);
                 border-radius: 50%;
                 display: flex;
                 justify-content: center;
                 align-items: center;
-                font-size: 12px;
+                font-size: 16px;
                 cursor: pointer;
                 z-index: 99998;
                 background-color: #333;
                 transition: background-color 0.2s ease, color 0.2s ease;
+                border: 1px solid #555;
             }
             
             #${MINIMIZED_ID}:hover {
                 background-color: #444;
-                color: rgba(255, 255, 255, 0.6);
+                color: rgba(255, 255, 255, 0.9);
             }
-
+        `;
+        
         document.head.appendChild(style);
         window.geminiSuiteStyleCleanup = () => style.remove(); // For cleanup if needed
     }
-    
-    let chatMessagesDiv, chatInput, fileInput, filePreviewArea; // Declare globally within IIFE
 
     function addEventListeners() {
-        chatMessagesDiv = suiteContainer.querySelector('.gas-chat-messages');
-        chatInput = suiteContainer.querySelector('.gas-chat-input');
-        fileInput = suiteContainer.querySelector('.gas-file-input');
-        filePreviewArea = suiteContainer.querySelector('.gas-file-preview-area');
-
         suiteContainer.querySelector('.gas-close-btn').onclick = () => {
             suiteContainer.remove();
             minimizedIcon.remove();
@@ -554,11 +574,11 @@ getElementById
 
         suiteContainer.querySelector('.gas-minimize-btn').onclick = () => {
             suiteContainer.style.display = 'none';
-            minimizedIcon.style.display = 'flex'; // 'flex' for centering content
+            minimizedIcon.style.display = 'flex';
         };
 
         minimizedIcon.onclick = () => {
-            suiteContainer.style.display = 'flex'; // 'flex' because main container is flex
+            suiteContainer.style.display = 'flex';
             minimizedIcon.style.display = 'none';
         };
 
@@ -567,9 +587,9 @@ getElementById
                 suiteContainer.querySelectorAll('.gas-tab').forEach(t => t.classList.remove('active'));
                 e.target.classList.add('active');
                 suiteContainer.querySelectorAll('.gas-tab-content').forEach(c => c.style.display = 'none');
-                suiteContainer.querySelector(`.gas-${e.target.dataset.tab}-content`).style.display = 'flex'; // or 'block' for settings
-                if (e.target.dataset.tab === 'settings') {
-                     suiteContainer.querySelector(`.gas-settings-content`).style.display = 'block'; // settings is not flex
+                const targetContent = suiteContainer.querySelector(`.gas-${e.target.dataset.tab}-content`);
+                if (targetContent) {
+                    targetContent.style.display = e.target.dataset.tab === 'settings' ? 'block' : 'flex';
                 }
             };
         });
@@ -595,7 +615,7 @@ getElementById
         suiteContainer.querySelector('.gas-attach-btn').onclick = () => fileInput.click();
         fileInput.onchange = handleFileUpload;
 
-        chatInput.addEventListener('paste', handlePaste); // For pasting images/text
+        chatInput.addEventListener('paste', handlePaste);
 
         suiteContainer.querySelector('.gas-paste-btn').onclick = async () => {
             try {
@@ -612,17 +632,19 @@ getElementById
         chatInput.addEventListener('dragover', (e) => {
             e.preventDefault();
             e.stopPropagation();
-            chatInput.style.borderColor = '#007bff'; // Highlight
+            chatInput.style.borderColor = '#007bff';
         });
+        
         chatInput.addEventListener('dragleave', (e) => {
             e.preventDefault();
             e.stopPropagation();
-            chatInput.style.borderColor = settings.theme === 'dark' ? '#555' : '#ccc'; // Reset border
+            chatInput.style.borderColor = settings.theme === 'dark' ? '#555' : '#ccc';
         });
+        
         chatInput.addEventListener('drop', (e) => {
             e.preventDefault();
             e.stopPropagation();
-            chatInput.style.borderColor = settings.theme === 'dark' ? '#555' : '#ccc'; // Reset border
+            chatInput.style.borderColor = settings.theme === 'dark' ? '#555' : '#ccc';
             if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
                 processFiles(e.dataTransfer.files);
             }
@@ -631,7 +653,7 @@ getElementById
 
     function handleFileUpload(event) {
         processFiles(event.target.files);
-        event.target.value = null; // Reset file input
+        event.target.value = null;
     }
 
     function handlePaste(event) {
@@ -640,7 +662,7 @@ getElementById
         for (let item of items) {
             if (item.kind === 'file') {
                 const file = item.getAsFile();
-                 if (file.type.startsWith('image/') || file.type === 'application/pdf' || file.type === 'text/plain') {
+                if (file.type.startsWith('image/') || file.type === 'application/pdf' || file.type === 'text/plain') {
                     filesToProcess.push(file);
                 }
             }
@@ -657,9 +679,9 @@ getElementById
                 addMessageToChat('system', `Unsupported file type: ${file.name} (${file.type}). Only images, PDFs, and TXT files are supported.`);
                 continue;
             }
-            if (file.size > 20 * 1024 * 1024) { // Example: 20MB limit for API (check Gemini docs)
-                 addMessageToChat('system', `File too large: ${file.name}. Max 20MB.`);
-                 continue;
+            if (file.size > 20 * 1024 * 1024) { // 20MB limit
+                addMessageToChat('system', `File too large: ${file.name}. Max 20MB.`);
+                continue;
             }
 
             const reader = new FileReader();
@@ -676,6 +698,8 @@ getElementById
     }
     
     function updateFilePreview() {
+        if (!filePreviewArea) return;
+        
         filePreviewArea.innerHTML = '';
         attachedFiles.forEach((file, index) => {
             const item = document.createElement('div');
@@ -693,33 +717,32 @@ getElementById
         });
     }
 
-
     function renderChatHistory() {
+        if (!chatMessagesDiv) return;
+        
         chatMessagesDiv.innerHTML = '';
         currentChatHistory.forEach(msg => addMessageToChat(msg.role, msg.parts, false));
     }
 
     function addMessageToChat(role, parts, save = true) {
+        if (!chatMessagesDiv) return;
+        
         const msgWrapper = document.createElement('div');
         const msgDiv = document.createElement('div');
         msgDiv.classList.add(role === 'user' ? 'user-message' : 'ai-message');
 
         let content = '';
-        if (typeof parts === 'string') { // For system messages or simple text
-            content = parts;
+        if (typeof parts === 'string') {
+            content = escapeHtml(parts);
         } else if (Array.isArray(parts)) {
-             parts.forEach(part => {
+            parts.forEach(part => {
                 if (part.text) {
-                    // Basic Markdown-like formatting for AI responses
-                    let htmlText = part.text
-                        .replace(/&/g, "&")
-                        .replace(/</g, "<")
-                        .replace(/>/g, ">")
-                        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // Bold
-                        .replace(/\*(.*?)\*/g, '<em>$1</em>')     // Italics
-                        .replace(/```([\s\S]*?)```/g, (match, code) => `<pre><code>${escapeHtml(code.trim())}</code></pre>`) // Code blocks
-                        .replace(/`(.*?)`/g, '<code>$1</code>')      // Inline code
-                        .replace(/\n/g, '<br>');                   // Newlines
+                    let htmlText = escapeHtml(part.text)
+                        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                        .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                        .replace(/```([\s\S]*?)```/g, (match, code) => `<pre><code>${escapeHtml(code.trim())}</code></pre>`)
+                        .replace(/`(.*?)`/g, '<code>$1</code>')
+                        .replace(/\n/g, '<br>');
                     content += htmlText;
                 } else if (part.inlineData) {
                     content += `[Attached ${part.inlineData.mimeType.split('/')[0]}] `;
@@ -727,21 +750,15 @@ getElementById
             });
         }
         
-        msgDiv.innerHTML = content; // Use innerHTML for formatted text
+        msgDiv.innerHTML = content;
 
-        if (role === 'system') { // Special styling for system messages
+        if (role === 'system') {
             msgDiv.style.backgroundColor = settings.theme === 'dark' ? '#6c757d' : '#f8f9fa';
             msgDiv.style.color = settings.theme === 'dark' ? '#lightgray' : 'gray';
             msgDiv.style.fontStyle = 'italic';
             msgDiv.style.alignSelf = 'center';
             msgDiv.style.maxWidth = '90%';
-        } else {
-             // Apply theme-specific message colors (already partially handled by class, but can be refined here)
-            msgDiv.style.backgroundColor = role === 'user' ?
-                (settings.theme === 'dark' ? '#3a5a78' : '#d1e7ff') :
-                (settings.theme === 'dark' ? '#4a4a4a' : '#e9e9e9');
         }
-
 
         msgWrapper.appendChild(msgDiv);
         chatMessagesDiv.appendChild(msgWrapper);
