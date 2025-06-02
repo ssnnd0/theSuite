@@ -17,7 +17,7 @@ javascript:(function() {
 
     let settings = {
         apiKey: '',
-        model: 'gemini-2.5-pro-latest', // Fixed model name
+        model: 'gemini-2.5-flash-preview-05-20', // Fixed model name
         useGoogleSearchGrounding: false,
         theme: 'dark', // 'light' or 'dark'
     };
@@ -89,21 +89,21 @@ javascript:(function() {
         const isLight = settings.theme === 'light';
         const isTransparent = settings.theme === 'transparent';
     
-        suiteContainer.style.backgroundColor = isTransparent ? 'rgba(30,30,30,0.6)' : isDark ? '#2c2c2c' : '#f0f0f0';
+        suiteContainer.style.backgroundColor = isTransparent ? 'rgba(128,128,128,0.3)' : isDark ? '#2c2c2c' : '#f0f0f0';
         suiteContainer.style.color = isTransparent ? '#ffffff' : isDark ? '#e0e0e0' : '#111';
     
         const textInputs = suiteContainer.querySelectorAll('input[type="text"], input[type="password"], textarea, select');
         textInputs.forEach(input => {
-            input.style.backgroundColor = isTransparent ? 'rgba(50,50,50,0.3)' : isDark ? '#333' : '#fff';
+            input.style.backgroundColor = isTransparent ? 'rgba(50,50,50,0.1)' : isDark ? '#333' : '#fff';
             input.style.color = isTransparent ? '#ffffff' : isDark ? '#e0e0e0' : '#111';
-            input.style.borderColor = isTransparent ? 'rgba(200,200,200,0.4)' : isDark ? '#555' : '#ccc';
+            input.style.borderColor = isTransparent ? 'rgba(200,200,200,0.2)' : isDark ? '#555' : '#ccc';
         });
     
         const buttons = suiteContainer.querySelectorAll('button, .gas-tab');
         buttons.forEach(btn => {
-            btn.style.backgroundColor = isTransparent ? 'rgba(80,80,80,0.4)' : isDark ? '#444' : '#ddd';
+            btn.style.backgroundColor = isTransparent ? 'rgba(80,80,80,0.3)' : isDark ? '#444' : '#ddd';
             btn.style.color = isTransparent ? '#ffffff' : isDark ? '#e0e0e0' : '#111';
-            btn.style.borderColor = isTransparent ? 'rgba(255,255,255,0.2)' : isDark ? '#555' : '#ccc';
+            btn.style.borderColor = isTransparent ? 'rgba(255,255,255,0.1)' : isDark ? '#555' : '#ccc';
         });
     
         if (chatMessagesDiv) {
@@ -151,8 +151,8 @@ javascript:(function() {
                 <label>API Key: <input type="password" class="gas-api-key" value="${settings.apiKey}"></label>
                 <label>Model:
                     <select class="gas-model-select">
-                        <option value="gemini-2.5-pro-latest" ${settings.model === 'gemini-2.5-pro-latest' ? 'selected' : ''}>Gemini 2.5 Pro</option>
-                        <option value="gemini-1.5-flash-latest" ${settings.model === 'gemini-1.5-flash-latest' ? 'selected' : ''}>Gemini 1.5 Flash</option>
+                        <option value="gemini-2.5-flash-preview-05-20" ${settings.model === 'gemini-2.5-flash-preview-05-20' ? 'selected' : ''}>Gemini 2.5 Flash Preview 5:20</option>
+                        <option value="gemini-2.5-pro-preview-05-06" ${settings.model === 'gemini-2.5-pro-preview-05-06' ? 'selected' : ''}>Gemini 2.5 Pro Preview 05-06 ***DOESNT WORK***</option>
                     </select>
                 </label>
                 <label>
