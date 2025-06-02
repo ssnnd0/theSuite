@@ -853,7 +853,7 @@ javascript:(function() {
                 }
             ],
             generationConfig: {
-                // "temperature": 0.9,
+                // "temperature": 0.7,
                 // "topK": 1,
                 // "topP": 1,
                 // "maxOutputTokens": 2048,
@@ -862,7 +862,8 @@ javascript:(function() {
             ...(settings.useGoogleSearchGrounding && (settings.model.includes('2.5-pro') || settings.model.includes('1.5-flash'))  // Grounding more relevant for Pro
                 ? {
                     tools: [{
-                        googleSearchRetrieval: {} // Empty object enables it
+                        googleSearchRetrieval: {}, // Empty object enables it
+                        urlContext: {}
                     }]
                   }
                 : {}
