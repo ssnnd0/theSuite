@@ -1,3 +1,4 @@
+(function(){
 javascript:(function() {
     const BOOKMARKLET_ID = 'theSuite';
     const MINIMIZED_ID = 'theSuite-minimized';
@@ -20,7 +21,7 @@ javascript:(function() {
         model: 'gemini-2.5-flash-preview-05-20', // Fixed model name
         useGoogleSearchGrounding: false,
         useUrlContext: true, // New setting for URL context
-        theme: 'dark', // 'light', 'dark', or 'transparent'
+        theme: 'transparent', // 'light', 'dark', or 'transparent'
     };
 
     let currentChatHistory = [];
@@ -32,7 +33,7 @@ javascript:(function() {
 
     const minimizedIcon = document.createElement('div');
     minimizedIcon.id = MINIMIZED_ID;
-    minimizedIcon.textContent = '★';
+    minimizedIcon.textContent = '*';
 
     // Declare these at the top level
     let chatMessagesDiv, chatInput, fileInput, filePreviewArea;
@@ -91,14 +92,14 @@ javascript:(function() {
         const isTransparent = settings.theme === 'transparent';
     
         // Main container theming
-        suiteContainer.style.backgroundColor = isTransparent ? 'rgba(40,40,40,0.85)' : isDark ? '#1e1e1e' : '#ffffff';
+        suiteContainer.style.backgroundColor = isTransparent ? 'rgba(40,40,40,0.2)' : isDark ? '#1e1e1e' : '#ffffff';
         suiteContainer.style.color = isTransparent ? '#ffffff' : isDark ? '#e0e0e0' : '#333333';
         suiteContainer.style.borderColor = isTransparent ? 'rgba(255,255,255,0.2)' : isDark ? '#444' : '#d0d0d0';
         
         // Header theming
         const header = suiteContainer.querySelector('.gas-header');
         if (header) {
-            header.style.backgroundColor = isTransparent ? 'rgba(60,60,60,0.7)' : isDark ? '#2a2a2a' : '#f8f9fa';
+            header.style.backgroundColor = isTransparent ? 'rgba(60,60,60,0.3)' : isDark ? '#2a2a2a' : '#f8f9fa';
             header.style.borderBottomColor = isTransparent ? 'rgba(255,255,255,0.1)' : isDark ? '#333' : '#e0e0e0';
         }
         
@@ -111,31 +112,31 @@ javascript:(function() {
         // Header buttons theming
         const headerButtons = suiteContainer.querySelectorAll('.gas-header-buttons button');
         headerButtons.forEach(btn => {
-            btn.style.color = isTransparent ? 'rgba(255,255,255,0.8)' : isDark ? '#aaa' : '#666';
+            btn.style.color = isTransparent ? 'rgba(255,255,255,0.6)' : isDark ? '#aaa' : '#666';
             btn.addEventListener('mouseenter', () => {
                 btn.style.color = isTransparent ? '#ffffff' : isDark ? '#fff' : '#333';
             });
             btn.addEventListener('mouseleave', () => {
-                btn.style.color = isTransparent ? 'rgba(255,255,255,0.8)' : isDark ? '#aaa' : '#666';
+                btn.style.color = isTransparent ? 'rgba(255,255,255,0.5)' : isDark ? '#aaa' : '#666';
             });
         });
         
         // Tabs theming
         const tabsContainer = suiteContainer.querySelector('.gas-tabs');
         if (tabsContainer) {
-            tabsContainer.style.backgroundColor = isTransparent ? 'rgba(50,50,50,0.6)' : isDark ? '#262626' : '#e9ecef';
+            tabsContainer.style.backgroundColor = isTransparent ? 'rgba(50,50,50,0.4)' : isDark ? '#262626' : '#e9ecef';
             tabsContainer.style.borderBottomColor = isTransparent ? 'rgba(255,255,255,0.1)' : isDark ? '#333' : '#d0d0d0';
         }
         
         const tabs = suiteContainer.querySelectorAll('.gas-tab');
         tabs.forEach(tab => {
             if (tab.classList.contains('active')) {
-                tab.style.backgroundColor = isTransparent ? 'rgba(80,80,80,0.8)' : isDark ? '#444' : '#ffffff';
+                tab.style.backgroundColor = isTransparent ? 'rgba(80,80,80,0.3)' : isDark ? '#444' : '#ffffff';
                 tab.style.color = isTransparent ? '#ffffff' : isDark ? '#fff' : '#007bff';
                 tab.style.borderBottomColor = isTransparent ? '#ffffff' : isDark ? '#555' : '#007bff';
             } else {
-                tab.style.backgroundColor = isTransparent ? 'rgba(60,60,60,0.4)' : isDark ? '#333' : '#f8f9fa';
-                tab.style.color = isTransparent ? 'rgba(255,255,255,0.8)' : isDark ? '#ccc' : '#6c757d';
+                tab.style.backgroundColor = isTransparent ? 'rgba(80,80,80,0.3)' : isDark ? '#333' : '#f8f9fa';
+                tab.style.color = isTransparent ? 'rgba(237, 232, 232, 0.45)' : isDark ? '#ccc' : '#6c757d';
                 tab.style.borderBottomColor = 'transparent';
             }
         });
@@ -143,9 +144,9 @@ javascript:(function() {
         // Input fields theming
         const textInputs = suiteContainer.querySelectorAll('input[type="text"], input[type="password"], textarea, select');
         textInputs.forEach(input => {
-            input.style.backgroundColor = isTransparent ? 'rgba(255,255,255,0.1)' : isDark ? '#2b2b2b' : '#ffffff';
-            input.style.color = isTransparent ? '#ffffff' : isDark ? '#e0e0e0' : '#333';
-            input.style.borderColor = isTransparent ? 'rgba(255,255,255,0.3)' : isDark ? '#555' : '#ced4da';
+            input.style.backgroundColor = isTransparent ? 'rgba(128,128,128,0.1)' : isDark ? '#2b2b2b' : '#ffffff';
+            input.style.color = isTransparent ? 'rgba(237, 232, 232, 0.45)' : isDark ? '#e0e0e0' : '#333';
+            input.style.borderColor = isTransparent ? 'rgba(128,128,128,0.3)' : isDark ? '#555' : '#ced4da';
         });
     
         // Buttons theming
@@ -173,7 +174,7 @@ javascript:(function() {
             
             chatMessagesDiv.querySelectorAll('.user-message, .ai-message').forEach(msgDiv => {
                 if (msgDiv.classList.contains('user-message')) {
-                    msgDiv.style.backgroundColor = isTransparent ? 'rgba(0,123,255,0.7)' : isDark ? '#2d6ea7' : '#007bff';
+                    msgDiv.style.backgroundColor = isTransparent ? 'rgba(0,123,255,0.4)' : isDark ? '#2d6ea7' : '#007bff';
                     msgDiv.style.color = '#ffffff';
                 } else {
                     msgDiv.style.backgroundColor = isTransparent ? 'rgba(255,255,255,0.15)' : isDark ? '#3a3a3a' : '#f8f9fa';
@@ -226,7 +227,7 @@ javascript:(function() {
                     <div class="gas-file-preview-area"></div>
                     <textarea class="gas-chat-input" placeholder="Type your message or drop files here..."></textarea>
                     <div class="gas-chat-buttons">
-                        <button class="gas-send-btn">S</button>
+                        <button class="gas-send-btn">Send</button>
                         <input type="file" class="gas-file-input" accept="image/*,application/pdf,text/plain" style="display:none;" multiple>
                         <button class="gas-attach-btn" title="Attach File (Image, PDF, TXT)">F</button>
                         <button class="gas-paste-btn" title="Paste from Clipboard">P</button>
@@ -363,11 +364,8 @@ javascript:(function() {
                 height: 600px;
                 min-width: 300px;
                 min-height: 200px;
-                background-color: #1e1e1e;
-                color: #f0f0f0;
-                border: 1px solid #444;
+                color:rgba(128, 128, 128, 0.32);
                 border-radius: 10px;
-                box-shadow: 0 8px 20px rgba(0,0,0,0.5);
                 z-index: 99999;
                 display: flex;
                 flex-direction: column;
@@ -644,22 +642,18 @@ javascript:(function() {
                 right: 10px;
                 width: 30px;
                 height: 30px;
-                color: rgba(200, 200, 200, 0.8);
-                border-radius: 50%;
+                color: rgba(200, 200, 200, 0.2);
                 display: flex;
                 justify-content: center;
                 align-items: center;
                 font-size: 16px;
                 cursor: pointer;
                 z-index: 99998;
-                background-color: #333;
                 transition: background-color 0.2s ease, color 0.2s ease;
-                border: 1px solid #555;
             }
             
             #${MINIMIZED_ID}:hover {
-                background-color: #444;
-                color: rgba(255, 255, 255, 0.9);
+                color: rgba(128, 128, 128, 0.1);
             }
         `;
         
@@ -954,11 +948,11 @@ javascript:(function() {
                 }
             ],
             generationConfig: {
-                // "temperature": 0.7,
-                // "topK": 1,
-                // "topP": 1,
-                // "maxOutputTokens": 2048,
-                // "stopSequences": []
+                "temperature": 0.7,
+                "topK": 1,
+                "topP": 1,
+                //"maxOutputTokens": 2048,
+                "stopSequences": []
             },
             ...(settings.useGoogleSearchGrounding && (settings.model.includes('2.5-pro') || settings.model.includes('1.5-flash'))  // Grounding more relevant for Pro
                 ? {
@@ -1025,3 +1019,4 @@ javascript:(function() {
     initUI();
 
 })();
+})()
