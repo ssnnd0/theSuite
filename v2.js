@@ -1,5 +1,6 @@
 (function(){
 javascript:(function() {
+    //https://github.com/ssnnd0/theSuite
     const BOOKMARKLET_ID = 'theSuite';
     const MINIMIZED_ID = 'theSuite-minimized';
 
@@ -272,6 +273,7 @@ javascript:(function() {
                     </label>
                 </div>
                 <button class="gas-save-settings-btn">Save Settings</button>
+                <a href="https://github.com/ssnnd0/theSuite">ssnnd0 2025</a>
             </div>
             <div class="gas-resize-handle"></div>
         `;
