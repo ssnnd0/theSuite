@@ -299,7 +299,7 @@ javascript:(function() {
             }
             
             .gas-header {
-                background-color: #2a2a2a;
+                background-color: transparent;
                 padding: 10px 14px;
                 cursor: grab;
                 display: flex;
@@ -342,14 +342,14 @@ javascript:(function() {
             
             .gas-tabs {
                 display: flex;
-                background-color: #262626;
+                background-color: transparent;
                 border-bottom: 1px solid #333;
             }
             
             .gas-tab {
                 padding: 10px 15px;
                 cursor: pointer;
-                background-color: #333;
+                background-color: transparent;
                 color: #ccc;
                 flex-grow: 1;
                 text-align: center;
@@ -359,13 +359,13 @@ javascript:(function() {
             }
             
             .gas-tab.active {
-                background-color: #444;
+                background-color: transparent;
                 color: #fff;
                 font-weight: bold;
             }
             
             .gas-tab:not(.active):hover {
-                background-color: #3a3a3a;
+                background-color: transparent;
             }
             
             .gas-tab-content {
@@ -403,7 +403,7 @@ javascript:(function() {
                 width: 100%;
                 padding: 8px;
                 border-radius: 5px;
-                background-color: #2e2e2e;
+                background-color: transparent;
                 color: #f0f0f0;
                 border: 1px solid #555;
                 transition: border 0.2s ease;
@@ -419,6 +419,7 @@ javascript:(function() {
             .gas-checkbox-label {
                 display: flex !important;
                 align-items: center;
+                color: rgb(0,0,0);
                 gap: 8px;
                 cursor: pointer;
             }
@@ -429,7 +430,7 @@ javascript:(function() {
             
             .gas-save-settings-btn {
                 padding: 10px 15px;
-                background-color: #007bff;
+                background-color: transparent;
                 color: white;
                 border: none;
                 border-radius: 5px;
@@ -439,7 +440,7 @@ javascript:(function() {
             }
             
             .gas-save-settings-btn:hover {
-                background-color: #0056b3;
+                background-color: transparent;
             }
             
             .gas-chat-messages {
@@ -451,7 +452,7 @@ javascript:(function() {
                 border-radius: 6px;
                 display: flex;
                 flex-direction: column;
-                background-color: #222;
+                background-color: transparent;
                 scroll-behavior: smooth;
             }
             
@@ -479,14 +480,14 @@ javascript:(function() {
             }
             
             .user-message {
-                background-color: #2d6ea7;
+                background-color: transparent;
                 align-self: flex-end;
                 color: #fff;
                 border-bottom-right-radius: 4px;
             }
             
             .ai-message {
-                background-color: #3a3a3a;
+                background-color: transparent;
                 align-self: flex-start;
                 border-bottom-left-radius: 4px;
             }
@@ -523,7 +524,7 @@ javascript:(function() {
             }
             
             .gas-file-preview-item {
-                background-color: #555;
+                background-color: transparent;
                 padding: 3px 6px;
                 border-radius: 4px;
                 font-size: 0.8em;
@@ -559,7 +560,7 @@ javascript:(function() {
                 margin-bottom: 6px;
                 min-height: 50px;
                 resize: vertical;
-                background-color: #2b2b2b;
+                background-color: transparent;
                 color: #f0f0f0;
                 transition: border 0.2s ease;
                 box-sizing: border-box;
@@ -573,7 +574,7 @@ javascript:(function() {
             
             .gas-chat-input.drag-over {
                 border-color: #007bff;
-                background-color: #2a3a4a;
+                background-color: transparent;
             }
             
             .gas-chat-buttons {
@@ -587,7 +588,7 @@ javascript:(function() {
                 border-radius: 5px;
                 cursor: pointer;
                 border: 1px solid #555;
-                background-color: #393939;
+                background-color: transparent;
                 color: #e0e0e0;
                 transition: background-color 0.2s ease;
                 user-select: none;
@@ -600,12 +601,12 @@ javascript:(function() {
             
             .gas-send-btn {
                 flex-grow: 1;
-                background-color: #28a745 !important;
+                background-color: transparent !important;
                 border-color: #28a745 !important;
             }
             
             .gas-send-btn:hover:not(:disabled) {
-                background-color: #1e7e34 !important;
+                background-color: transparent !important;
             }
             
             .gas-attach-btn,
